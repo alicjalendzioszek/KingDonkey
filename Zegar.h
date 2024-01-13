@@ -9,16 +9,23 @@ extern "C" {
 class Zegar
 {
 public:
-	double start = 0;
-	double tick = 0;
 
 	Zegar();
-
+	void obliczCzasRozgrywki();
 	void resetZegar();
+	double wezDelte();
+	double wezWorldTime();
+	double wezFps();
+	double podejrzyjDelteMS();
 
-	// w milisekundach
-	double obliczIleUplyneloOdStartu();
-
-	// w milisekundach
+private:
 	double obliczDelte();
+	
+	double tick = 0;
+	int  frames = 0;
+	double delta = 0;	// czas jednej klatki
+	double worldTime = 0;
+	double fpsTimer = 0;
+	double  fps = 0;
+
 };

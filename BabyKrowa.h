@@ -1,17 +1,15 @@
 #pragma once
 #include "struktury.h"
 
-class Platforma {
+class BabyKrowa
+{
 public:
 	XY pozycja;
 	XY rozmiar;
-	bool czyGraczZnajdujeSieNad;
-	DlugoscPlatformy dlugosc;
-
+	const double przesuniecieZderzenia = 1.0;
 	double wezX1Zderzen();
 	double wezX2Zderzen();
 	double wezY1Zderzen();
 	double wezY2Zderzen();
-
 };
 

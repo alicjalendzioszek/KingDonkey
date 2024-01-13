@@ -1,9 +1,14 @@
 #pragma once
 #include "funkcje.h"
-#define SCREEN_WIDTH	640
-#define SCREEN_HEIGHT	480
+#define SCREEN_WIDTH	1400
+#define SCREEN_HEIGHT	800
 #include "World.h"
+
 class Platforma;
+class Drabina;
+class Bele;
+class BabyKrowa;
+class Kukurydza;
 //pamietac zeby pozamieniac png na bitmapy
 //upewnic sie czy musze robic swoje odbicia lustrzane czy wystraczy ze bede jakos w visualu je zamieniac
 class Okno
@@ -13,19 +18,43 @@ public:
 	int zielony;
 	int czerwony;
 	int niebieski;
+	int fiolet;
+	int jasnyNiebieski;
 	//surface dla gracza + animacje
-	SDL_Surface* graczSurface = nullptr;
-	SDL_Surface* graczSkokSurface = nullptr;
-	SDL_Surface* graczRuch1Surface = nullptr;
-	SDL_Surface* graczRuch2Surface = nullptr;
+	SDL_Surface* graczPrawo= nullptr;
+	SDL_Surface* graczSkokPrawo= nullptr;
+	SDL_Surface* graczRuch1Prawo= nullptr;
+	SDL_Surface* graczRuch2Prawo= nullptr;
+	SDL_Surface* graczLewo = nullptr;
+	SDL_Surface* graczSkokLewo = nullptr;
+	SDL_Surface* graczRuch1Lewo = nullptr;
+	SDL_Surface* graczRuch2Lewo = nullptr;
+	SDL_Surface* graczDrabina= nullptr;
+	SDL_Surface* graczDrabina2= nullptr;
+	SDL_Surface* graczDrabina3= nullptr;
+	//surface dla babyKrowy
+	SDL_Surface* babyKrowaSurface = nullptr;
 	//surface dla przeciwnika + animacje
-	SDL_Surface* przeciwnikSurface = nullptr;
-	SDL_Surface* przeciwnik1Surface = nullptr;
-	SDL_Surface* przeciwnik2Surface = nullptr;
+	SDL_Surface* przeciwnikPrawo= nullptr;
+	SDL_Surface* przeciwnik2Prawo= nullptr;
+	SDL_Surface* przeciwnik3Prawo= nullptr;
+	SDL_Surface* przeciwnikLewo= nullptr;
+	SDL_Surface* przeciwnik2Lewo= nullptr;
+	SDL_Surface* przeciwnik3Lewo= nullptr;
 	//surface dla beczki
-	SDL_Surface* beczkaSurface = nullptr;
+	SDL_Surface* beczka1= nullptr;
+	SDL_Surface* beczka2= nullptr;
 	//surface dla platformy
-	SDL_Surface* platformaSurface = nullptr;
+	SDL_Surface* platformaNajkrotsza= nullptr;
+	SDL_Surface* platformaSrednia= nullptr;
+	SDL_Surface* platformaNajdluzsza= nullptr;
+	//surface stosu bel
+	SDL_Surface* stosBel = nullptr;
+	//surface dla drabin
+	SDL_Surface* drabinaKrotka= nullptr;
+	SDL_Surface* drabinaDluga= nullptr;
+	//kukurydza
+	SDL_Surface* kukurydzaSurface = nullptr;
 	//pozostale surface
 	SDL_Surface* screen = nullptr;
 	SDL_Surface* charset = nullptr;
@@ -39,10 +68,11 @@ public:
 	~Okno();
 
 	int inicjalizacjaSdl();
-
+	void wczytajKolory();
 	int wczytajBitmapy();
 
 	void narysujRamke(double worldTime, double fps);
+	void narysujRamkeZWynikiem(World& world);
 
 	void wyczyscEkran();
 
@@ -54,12 +84,23 @@ public:
 
 	void narysujPlansze(World& world);
 
+	void narysujBabyKrowe(BabyKrowa& babyKrowa);
 
-	void narysujGracza(Gracz& gracz);
+	void narysujPrzeciwnika(Przeciwnik& przeciwnik,double worldTime);
 
-	void narysujBeczke(Beczka& beczka);
+	void narysujGracza(Gracz& gracz,World&world);
 
-	void narysujRampe(Platforma& platforma);
+	void narysujBeczke(Beczka& beczka, double worldTime);
+
+	void narysujPlatforme(Platforma& platforma);
+
+	void narysujDrabine(Drabina& drabina);
+
+	void narysujBele(Bele&bele);
+
+	void narysujKukurydze(Kukurydza& kukurydza);
+
+	SDL_Surface* wezSurfaceDrabina(int numerKlatki);
 
 };
 
