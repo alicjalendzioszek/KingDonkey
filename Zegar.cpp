@@ -10,11 +10,8 @@ Zegar::Zegar()
 void Zegar::resetZegar()
 {
 	tick = SDL_GetTicks();
-	frames = 0;
 	delta = 0;
 	worldTime = 0;
-	fpsTimer = 0;
-	fps = 0;
 }
 
 double Zegar::obliczDelte()
@@ -32,30 +29,18 @@ double Zegar::podejrzyjDelteMS()
 	return (nowyTick - tick);
 }
 
-double Zegar::wezDelte()
+double Zegar::getDelta()
 {
 	return delta;
 }
 
-double Zegar::wezWorldTime()
+double Zegar::getWorldTime()
 {
 	return worldTime;
-}
-
-double Zegar::wezFps()
-{
-	return fps;
 }
 
 void Zegar::obliczCzasRozgrywki()
 {
 	obliczDelte();
 	worldTime += delta;
-
-	fpsTimer += delta;
-	if (fpsTimer > 0.5) {
-		fps = frames * 2;
-		frames = 0;
-		fpsTimer -= 0.5;
-	};
 }

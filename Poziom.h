@@ -1,6 +1,6 @@
 #pragma once
 #include "struktury.h"
-
+#include "rozmieszczeniePrzedmiotow.h"
 class World;
 class Gracz;
 class Przeciwnik;
@@ -11,16 +11,20 @@ class Beczka;
 class Kukurydza;
 
 class Poziom {
+private:
+	int numerPoziomu = 1;
 public:
 
-	int numerPoziomu = 1;
-
+	int getNumerPoziomu();
+	void setNumerPoziomu(int numerPoziomu);
+	void zwiekszNumerPoziomu();
+	
 	void wyborPoziomu(World& world,Okno&okno);
 
 	void stworzPoziom(World& world, Okno& okno);
 
-
 	void inicjalizacjaDrabiny(World&world,int numerDrabiny,int pozycjaX, int pozycjaY, DlugoscDrabiny dlugosc, bool czyWPlatformie);
+
 	void ustawDrabinieDlugoscPlatformyWKtorejJest(World& world, int numerDrabiny, DlugoscPlatformy dlugoscPlatformyWKtorejJest);
 
 	void inicjalizacjaPlatformy(World& world,int numerPlatformy, int pozycjaX, int pozycjaY, DlugoscPlatformy dlugosc);
@@ -36,7 +40,7 @@ public:
 	void inicjalizacjaKukurydzy(World& world, int numerKukurydzy, int pozycjaX, int pozycjaY);
 
 	void ustawienieBeli(Beczka& bela, int pozycjaX, int pozycjaY, double predkosc);
-	// ustalic ilosc beczke, ramp i ich pozycje oraz pozycje gracza dla kazdego z poziomow
+
 	void stworzPoziom1(World& world, Okno& okno);
 
 	void stworzPoziom2(World& world, Okno&okno);
@@ -44,6 +48,4 @@ public:
 	void stworzPoziom3(World& world, Okno&okno);
 
 	
-
-
 };

@@ -1,62 +1,56 @@
 #include "Event.h"
 #include "Okno.h"
 
-#include <iostream>
 
 void Event::readEvents(World& world, Okno& okno)
 {
-	// obs³uga zdarzeñ (o ile jakieœ zasz³y) / handling of events (if there were any)
+	// obs³uga zdarzeñ (o ile jakieœ zasz³y)
 
 	while (SDL_PollEvent(&eventKlikniety)) {
 		int keySymbol = eventKlikniety.key.keysym.sym;
 
 		switch (eventKlikniety.type) {
-		case SDL_KEYDOWN://todo zamienic czy na drabinie bo to dopiero ma potem byc sprawdzane
-			if (keySymbol == SDLK_ESCAPE) okno.czyKoniec = true;
+		case SDL_KEYDOWN:
+			if (keySymbol == SDLK_ESCAPE) okno.setCzyKoniec(true);
 			else if (keySymbol == SDLK_w)
 			{
-				world.gracz.poruszaniePoDrabinieWgore = true;
-				world.gracz.numerKlatkiPion++;
+				world.gracz.setPoruszaniePoDrabinieWGore(true);
+				world.gracz.zwiekszNumerKlatkiPion();
 			}
 			else if (keySymbol == SDLK_s)
 			{
-				world.gracz.poruszaniePoDrabinieWdol = true;
-				world.gracz.numerKlatkiPion++;
+				world.gracz.setPoruszaniePoDrabinieWDol(true);
+				world.gracz.zwiekszNumerKlatkiPion();
 			}
-			else if (keySymbol == SDLK_a) { world.gracz.predkosc.x = -1.0 * world.gracz.predkoscRuchu; world.gracz.numerKlatkiPoziom++; world.gracz.czyRuchWPrawo = false; }
-			else if (keySymbol == SDLK_d) { world.gracz.predkosc.x = world.gracz.predkoscRuchu; world.gracz.numerKlatkiPoziom++; world.gracz.czyRuchWPrawo = true; }
+			else if (keySymbol == SDLK_a) { world.gracz.setPredkoscX(-1.0 * world.gracz.getPredkoscRuchu());  world.gracz.zwiekszNumerKlatkiPoziom(); world.gracz.setCzyRuchWPrawo(false); }
+			else if (keySymbol == SDLK_d) { world.gracz.setPredkoscX(world.gracz.getPredkoscRuchu()); world.gracz.zwiekszNumerKlatkiPoziom();  world.gracz.setCzyRuchWPrawo(true); }
 			else if (keySymbol == SDLK_SPACE)
 			{
-				/*if (world.gracz.czyAnimacjaSkoku == false)
-				{
-					world.gracz.czyAnimacjaSkoku = true;*/
-				if (world.gracz.predkosc.y == 0) {
-
-
-					world.gracz.czySkoczyl = true;
+				if (world.gracz.getPredkosc().y == 0) {
+					world.gracz.setCzySkoczyl(true);
+					world.gracz.setCzyDodanoPunktyZaSkok(false);
 				}
-				/*}*/
 
 			}
-			else if (keySymbol == SDLK_1) { world.poziom.numerPoziomu = 1; world.czyKoniecPoziomu = true; world.zegar.resetZegar(); }
-			else if (keySymbol == SDLK_2) { world.poziom.numerPoziomu = 2; world.czyKoniecPoziomu = true; world.zegar.resetZegar(); }
-			else if (keySymbol == SDLK_3) { world.poziom.numerPoziomu = 3; world.czyKoniecPoziomu = true; world.zegar.resetZegar(); }
-			else if (keySymbol == SDLK_n) { world.czyKoniecPoziomu = true; world.gracz.numerKlatkiPion = 0; world.gracz.numerKlatkiPoziom = 0; world.zegar.resetZegar(); world.poziom.numerPoziomu = 1; world.gracz.liczbaPunktowGracza = 0; }
+			else if (keySymbol == SDLK_1) { world.poziom.setNumerPoziomu(1); world.setCzyKoniecPoziomu(true); world.zegar.resetZegar(); world.setOstatniaAktywacjaBeczki(0); }
+			else if (keySymbol == SDLK_2) { world.poziom.setNumerPoziomu(2); world.setCzyKoniecPoziomu(true); world.zegar.resetZegar(); world.setOstatniaAktywacjaBeczki(0); }
+			else if (keySymbol == SDLK_3) { world.poziom.setNumerPoziomu(3); world.setCzyKoniecPoziomu(true); world.zegar.resetZegar(); world.setOstatniaAktywacjaBeczki(0); }
+			else if (keySymbol == SDLK_n) { world.setCzyKoniecPoziomu(true); world.gracz.setNumerKlatkiPion(0); world.gracz.setNumerKlatkiPoziom(0); world.setOstatniaAktywacjaBeczki(0); world.zegar.resetZegar(); world.poziom.setNumerPoziomu(1); world.gracz.setLiczbaPunktowGracza(0); }
 			break;
 		case SDL_KEYUP:
 			if (keySymbol == SDLK_a || keySymbol == SDLK_d) {
-				world.gracz.predkosc.x = 0.0;
+				world.gracz.setPredkoscX(0.0);
 			}
 			else if (keySymbol == SDLK_w) {
-				world.gracz.poruszaniePoDrabinieWgore = false;
+				world.gracz.setPoruszaniePoDrabinieWGore(false);
 			}
 			else if (keySymbol == SDLK_s) {
-				world.gracz.poruszaniePoDrabinieWdol = false;
+				world.gracz.setPoruszaniePoDrabinieWDol(false);
 			}
 
 			break;
 		case SDL_QUIT:
-			okno.czyKoniec = true;
+			okno.setCzyKoniec(true);
 			break;
 		};
 	};

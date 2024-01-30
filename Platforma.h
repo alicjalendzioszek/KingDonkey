@@ -2,16 +2,27 @@
 #include "struktury.h"
 
 class Platforma {
-public:
+private:
 	XY pozycja;
 	XY rozmiar;
-	bool czyGraczZnajdujeSieNad;
 	DlugoscPlatformy dlugosc;
 
+	bool czyGraczZnajdujeSieNad;
+	
+public:
+	
 	double wezX1Zderzen();
 	double wezX2Zderzen();
 	double wezY1Zderzen();
 	double wezY2Zderzen();
+
+	XY getPozycja();
+	XY getRozmiar();
+	DlugoscPlatformy getDlugosc();
+	
+	void setPozycja(double x, double y);
+	void setRozmiar(double x, double y);
+	void setDlugosc(DlugoscPlatformy dlugosc);
 
 };
 

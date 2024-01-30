@@ -1,37 +1,65 @@
 #pragma once
 #include "struktury.h"
 #include "Zegar.h"
-
-//KONIECZNIE TODO TO DO BO TO MUSI BYC TYLKO W OKNIE, NIE MOZE BYC TU DRUGI RAZ WIEC TRZEBA BEDZIE TO ZMIENIC!!!!!!!!!!!!!!
-#define SCREEN_WIDTH	1400
-#define SCREEN_HEIGHT	800
+#include "wymiaryOkna.h"
 
 class Beczka
 {
-public:
-	Zegar* zegar = nullptr;
+private:
 
 	XY pozycja;
 	XY pozycjaStartowa;
 
 	XY rozmiar;
+
 	XY predkosc;
 	XY predkoscStart;
+	
 	bool czyAktywna = false;
 	bool czySpada = false;
-	const double przesuniecieZderzenia = 1.0;
-	//const double podniesienieBeczki = -20.0;
-	//int klatka = 0;
-	int liczbaUpadkow = 0;
 	bool czyMialMiejsceUpadek = false;
 	bool czyZmienionoPredkosc = false;
-	
-	Beczka();
 
-	//	void ustawPredkoscBeczkiX();
+	int liczbaUpadkow = 0;
+	const int liczbaPunktowZaPrzeskoczenie = 300;
+
+	const double przesuniecieZderzenia = 1.0;
+	const double przesunieciePrzeskoku = 100.0;
 	const double poczatkowaPredkosc = -100;
 	const double poczatkowaLiczbaUpadkow = 2;
 	const double predkoscZmianyWSpadku = 700;
+
+	Zegar* zegar = nullptr;
+public:
+	
+	//gettery
+	bool getAktywnosc();
+	bool getCzySpada();
+	bool getCzyMialMiejsceUpadek();
+	int getLiczbaPunktowZaPrzeskoczenie();
+	int getLiczbaUpadkow();
+	double getPoczatkowaPredkosc();
+	XY getRozmiar();
+	XY getPozycja();
+
+	//settery
+	void setPredkoscX(double predkoscX);
+	void setPredkoscY(double predkoscY);
+	void setPredkoscStartX(double predkoscX);
+	void setPozycjaY(double y);
+	void setCzyZmienionoPredkosc(bool czyZmianaPredkosci);
+	void setCzyMialMiejsceUpadek(bool czyMialMiejsceUpadek);
+	void setPozycja(double x, double y);
+	void setRozmiar(double x, double y);
+	void setAktywnosc(bool aktywnosc);
+	void setPozycjaStartowa(double x, double y);
+	void setCzySpada(bool spadek);
+
+	void zwiekszLiczbeUpadkow();
+	
+	Beczka();
+
+	//funkcje
 	void zaaktualizujPozycjeBeli(int numerPoziomu);
 
 	void aktualizacjaPredkosciPoziom1();
@@ -44,6 +72,8 @@ public:
 	double wezX2Zderzen();
 	double wezY1Zderzen();
 	double wezY2Zderzen();
+
+	double wezYPrzeskoku();
 
 	void ustawZegar(Zegar* zegar);
 };

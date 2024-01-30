@@ -20,3 +20,20 @@ double BabyKrowa::wezY2Zderzen()
     return this->pozycja.y + this->rozmiar.y + przesuniecieZderzenia;
 }
 
+XY BabyKrowa::getPozycja()
+{
+    return pozycja;
+}
+
+void BabyKrowa::setPozycja(int x, int y)
+{
+    this->pozycja.x = x;
+    this->pozycja.y = y;
+}
+
+void BabyKrowa::setRozmiar(int x, int y)
+{
+    this->rozmiar.x = x;
+    this->rozmiar.y = y;
+}
+

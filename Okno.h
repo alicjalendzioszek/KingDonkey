@@ -1,7 +1,5 @@
 #pragma once
 #include "funkcje.h"
-#define SCREEN_WIDTH	1400
-#define SCREEN_HEIGHT	800
 #include "World.h"
 
 class Platforma;
@@ -9,17 +7,23 @@ class Drabina;
 class Bele;
 class BabyKrowa;
 class Kukurydza;
-//pamietac zeby pozamieniac png na bitmapy
-//upewnic sie czy musze robic swoje odbicia lustrzane czy wystraczy ze bede jakos w visualu je zamieniac
+
 class Okno
 {
-public:
+private:
 	int czarny;
 	int zielony;
 	int czerwony;
 	int niebieski;
 	int fiolet;
 	int jasnyNiebieski;
+
+	bool czyKoniec = false;
+	double czasRozpoczeciaAnimacjiDodawaniaPunktowSkok = 0.0;
+	double czasRozpoczeciaAnimacjiDodawaniaPunktowBonus = 0.0;
+	const double czasTrwaniaAnimacjiDodawaniaPunktow = 1.0;
+public:
+
 	//surface dla gracza + animacje
 	SDL_Surface* graczPrawo= nullptr;
 	SDL_Surface* graczSkokPrawo= nullptr;
@@ -41,7 +45,7 @@ public:
 	SDL_Surface* przeciwnikLewo= nullptr;
 	SDL_Surface* przeciwnik2Lewo= nullptr;
 	SDL_Surface* przeciwnik3Lewo= nullptr;
-	//surface dla beczki
+	//surface dla beczki + animacje
 	SDL_Surface* beczka1= nullptr;
 	SDL_Surface* beczka2= nullptr;
 	//surface dla platformy
@@ -53,8 +57,11 @@ public:
 	//surface dla drabin
 	SDL_Surface* drabinaKrotka= nullptr;
 	SDL_Surface* drabinaDluga= nullptr;
-	//kukurydza
+	//surface dla kukurydzy
 	SDL_Surface* kukurydzaSurface = nullptr;
+	//surface punktow
+	SDL_Surface* punktyZaSkok = nullptr;
+	SDL_Surface* punktyZaZebranieBonusu = nullptr;
 	//pozostale surface
 	SDL_Surface* screen = nullptr;
 	SDL_Surface* charset = nullptr;
@@ -62,8 +69,12 @@ public:
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 
-	bool czyKoniec = false;
-
+	//gettery i settery
+	bool getCzyKoniec();
+	void setCzyKoniec(bool koniec);
+	void setCzasRozpoczeciaAnimacjiDodawaniaPunktowSkok(double czas);
+	void setCzasRozpoczeciaAnimacjiDodawaniaPunktowBonus(double czas);
+	
 	Okno();
 	~Okno();
 
@@ -71,14 +82,13 @@ public:
 	void wczytajKolory();
 	int wczytajBitmapy();
 
-	void narysujRamke(double worldTime, double fps);
+	void narysujRamke(double worldTime);
+
 	void narysujRamkeZWynikiem(World& world);
-
-	void wyczyscEkran();
-
 
 	void narysujSwiat(World& world);
 
+	void wyczyscEkran();
 
 	void zaaktualizujEkran();
 
@@ -88,7 +98,7 @@ public:
 
 	void narysujPrzeciwnika(Przeciwnik& przeciwnik,double worldTime);
 
-	void narysujGracza(Gracz& gracz,World&world);
+	void narysujGracza(World&world);
 
 	void narysujBeczke(Beczka& beczka, double worldTime);
 
@@ -99,6 +109,10 @@ public:
 	void narysujBele(Bele&bele);
 
 	void narysujKukurydze(Kukurydza& kukurydza);
+
+	void narysujPunktyZaSkok(World&world);
+
+	void narysujPunktyZaZebranieBonusa(World&world);
 
 	SDL_Surface* wezSurfaceDrabina(int numerKlatki);
 

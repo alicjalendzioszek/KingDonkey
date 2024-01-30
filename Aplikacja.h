@@ -4,13 +4,12 @@
 
 class Aplikacja
 {
-public:
+private:
 	Okno okno;
 	World world;
-
-
+public:
+	
 	void utworzAplikacje();
-
 	void wystartujGre();
 
 };

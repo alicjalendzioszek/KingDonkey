@@ -1,5 +1,25 @@
 #include "Okno.h"
 
+bool Okno::getCzyKoniec()
+{
+	return czyKoniec;
+}
+
+void Okno::setCzyKoniec(bool koniec)
+{
+	this->czyKoniec = koniec;
+}
+
+void Okno::setCzasRozpoczeciaAnimacjiDodawaniaPunktowSkok(double czas)
+{
+	this->czasRozpoczeciaAnimacjiDodawaniaPunktowSkok = czas;
+}
+
+void Okno::setCzasRozpoczeciaAnimacjiDodawaniaPunktowBonus(double czas)
+{
+	this->czasRozpoczeciaAnimacjiDodawaniaPunktowBonus = czas;
+}
+
 Okno::Okno()
 {
 }
@@ -98,6 +118,22 @@ int Okno::wczytajBitmapy()
 		return 1;
 	};
 	SDL_SetColorKey(kukurydzaSurface, true, 0x000000);
+
+	punktyZaSkok = SDL_LoadBMP("./bitmaps/300.bmp");
+	if (punktyZaSkok == NULL) {
+		printf("SDL_LoadBMP(300.bmp) error: %s\n", SDL_GetError());
+		SDL_Quit();
+		return 1;
+	};
+	SDL_SetColorKey(punktyZaSkok, true, 0x000000);
+
+	punktyZaZebranieBonusu = SDL_LoadBMP("./bitmaps/50.bmp");
+	if (punktyZaZebranieBonusu == NULL) {
+		printf("SDL_LoadBMP(50.bmp) error: %s\n", SDL_GetError());
+		SDL_Quit();
+		return 1;
+	};
+	SDL_SetColorKey(punktyZaZebranieBonusu, true, 0x000000);
 
 	//gracz i jego animacje
 	graczPrawo = SDL_LoadBMP("./bitmaps/krowaPrawy.bmp");
@@ -311,19 +347,15 @@ int Okno::wczytajBitmapy()
 	SDL_SetColorKey(babyKrowaSurface, true, 0x000000);
 }
 
-void Okno::narysujRamke(double worldTime, double fps)
+void Okno::narysujRamke(double worldTime)
 {
 	char text[128] = {};
 	// tekst informacyjny
 	DrawRectangle(screen, 350, 4, SCREEN_WIDTH - 700, 33, jasnyNiebieski, fiolet);
-	sprintf_s(text, "Czas trwania poziomu = %.1lf s       1, 2, 3 - wybor poziomu         ZROBIONE: A,B,C,E", worldTime);
+	sprintf_s(text, "Czas trwania poziomu = %.1lf s       1, 2, 3 - wybor poziomu        ZROBIONE: A,B,C,E,F", worldTime);
 	DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text, charset);
 	sprintf_s(text, "esc-wyjscie    n - nowa gra    w,a,s,d - poruszanie    spacja - skok");
 	DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 22, text, charset);
-
-	
-
-
 }
 
 void Okno::narysujRamkeZWynikiem(World& world)//TODO
@@ -337,7 +369,7 @@ void Okno::narysujRamkeZWynikiem(World& world)//TODO
 	int y = margin;
 
 	DrawRectangle(screen, x, y, width, height, jasnyNiebieski, fiolet);
-	sprintf_s(text, "WYNIK: %.1ld ", world.gracz.liczbaPunktowGracza);
+	sprintf_s(text, "WYNIK: %.1ld ", world.gracz.getLiczbaPunktowGracza());
 	DrawString(screen, (SCREEN_WIDTH-90) - strlen(text) * 8 / 2, 15, text, charset);
 }
 
@@ -352,19 +384,13 @@ void Okno::narysujSwiat(World& world)
 	world.zegar.obliczCzasRozgrywki();
 	
 	narysujPlansze(world);
-	narysujGracza(world.gracz, world);
-	/*for (int i = 0; i < world.liczbaBel; i++)
-	{
-		if (world.bele[i].czyAktywna)
-		{
-
-			narysujBeczke(world.bele[i], world.zegar.wezWorldTime());
-		}
-	}*/
+	narysujGracza(world);
+	narysujPunktyZaSkok(world);
+	narysujPunktyZaZebranieBonusa(world);
 	narysujBele(world.stosBel);
 	narysujBabyKrowe(world.babyKrowa);
-	narysujPrzeciwnika(world.przeciwnik, world.zegar.wezWorldTime());
-	narysujRamke(world.zegar.wezWorldTime(), world.zegar.wezFps());//todo
+	narysujPrzeciwnika(world.przeciwnik, world.zegar.getWorldTime());
+	narysujRamke(world.zegar.getWorldTime());
 	narysujRamkeZWynikiem(world);
 	zaaktualizujEkran();
 }
@@ -378,258 +404,300 @@ void Okno::zaaktualizujEkran()
 
 void Okno::narysujPlansze(World& world)
 {
-	for (int i = 0; i < world.liczbaDrabin; i++) {
-		narysujDrabine(world.drabiny[i]);
+	for (int i = 0; i < world.getLiczbaDrabin(); i++) {
+		narysujDrabine(world.getDrabiny()[i]);
 	}
 
-	for (int i = 0; i < world.liczbaPlatform; i++) {
-		narysujPlatforme(world.platformy[i]);
+	for (int i = 0; i < world.getLiczbaPlatform(); i++) {
+		narysujPlatforme(world.getPlatformy()[i]);
 	}
 
-	for (int i = 0; i < world.liczbaKukurydz; i++)
+	for (int i = 0; i < world.getLiczbaKukurydz(); i++)
 	{
-		if (world.kukurydze[i].czyAktywna)
+		if (world.getKukurydze()[i].getCzyAktywna())
 		{
-			narysujKukurydze(world.kukurydze[i]);
+			narysujKukurydze(world.getKukurydze()[i]);
 		}
 	}
 
-	for (int i = 0; i < world.liczbaBel; i++) {
-		if (world.bele[i].czyAktywna == true) {
-			narysujBeczke(world.bele[i], world.zegar.wezWorldTime());
+	for (int i = 0; i < world.getLiczbaBel(); i++) {
+		if (world.getBele()[i].getAktywnosc() == true) {
+			narysujBeczke(world.getBele()[i], world.zegar.getWorldTime());
 		}
 	}
 }
 
 void Okno::narysujBabyKrowe(BabyKrowa& babyKrowa)
 {
-	DrawSurface(screen, babyKrowaSurface, babyKrowa.pozycja.x, babyKrowa.pozycja.y);
+	DrawSurface(screen, babyKrowaSurface, babyKrowa.getPozycja().x, babyKrowa.getPozycja().y);
 }
 
 void Okno::narysujPrzeciwnika(Przeciwnik& przeciwnik, double worldTime)
 {
 	if ((int)worldTime % 6 == 0)
 	{
-		if (przeciwnik.zwroconyWPrawo)
+		if (przeciwnik.getZwroconyWPrawo())
 		{
-			DrawSurface(screen, przeciwnikPrawo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnikPrawo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 		else
 		{
-			DrawSurface(screen, przeciwnikLewo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnikLewo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 	}
 	else if ((int)worldTime % 6 == 1)
 	{
-		if (przeciwnik.zwroconyWPrawo)
+		if (przeciwnik.getZwroconyWPrawo())
 		{
-			DrawSurface(screen, przeciwnik2Prawo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnik2Prawo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 		else
 		{
-			DrawSurface(screen, przeciwnik2Lewo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnik2Lewo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 	}
 	else if ((int)worldTime % 6 == 2)
 	{
-		if (przeciwnik.zwroconyWPrawo)
+		if (przeciwnik.getZwroconyWPrawo())
 		{
-			DrawSurface(screen, przeciwnik3Prawo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnik3Prawo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 		else
 		{
-			DrawSurface(screen, przeciwnik3Lewo, przeciwnik.pozycja.x + 10, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnik3Lewo, przeciwnik.getPozycja().x + 10, przeciwnik.getPozycja().y);
 		}
 	}
 	else if ((int)worldTime % 6 == 3)
 	{
-		if (przeciwnik.zwroconyWPrawo)
+		if (przeciwnik.getZwroconyWPrawo())
 		{
-			DrawSurface(screen, przeciwnik3Lewo, przeciwnik.pozycja.x - 5, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnik3Lewo, przeciwnik.getPozycja().x - 5, przeciwnik.getPozycja().y);
 		}
 		else
 		{
-			DrawSurface(screen, przeciwnik3Prawo, przeciwnik.pozycja.x + 10, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnik3Prawo, przeciwnik.getPozycja().x + 10, przeciwnik.getPozycja().y);
 		}
 	}
 	else if ((int)worldTime % 6 == 4)
 	{
-		if (przeciwnik.zwroconyWPrawo)
+		if (przeciwnik.getZwroconyWPrawo())
 		{
-			DrawSurface(screen, przeciwnik2Lewo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnik2Lewo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 		else
 		{
-			DrawSurface(screen, przeciwnik2Prawo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnik2Prawo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 
 	}
 	else if ((int)worldTime % 6 == 5)
 	{
-		if (przeciwnik.zwroconyWPrawo)
+		if (przeciwnik.getZwroconyWPrawo())
 		{
-			DrawSurface(screen, przeciwnikLewo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnikLewo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 		else
 		{
-			DrawSurface(screen, przeciwnikPrawo, przeciwnik.pozycja.x, przeciwnik.pozycja.y);
+			DrawSurface(screen, przeciwnikPrawo, przeciwnik.getPozycja().x, przeciwnik.getPozycja().y);
 		}
 	}
 }
 
-void Okno::narysujGracza(Gracz& gracz, World& world)
+void Okno::narysujGracza(World& world)
 {
-	bool czyGraczSpada = gracz.predkosc.y > 0 && gracz.czyNaDrabinie == false;
-	bool czyGraczLeci = gracz.predkosc.y < 0 && gracz.czyNaDrabinie == false;
-	bool czySiePorusza = (gracz.czyNaDrabinie == false) && (gracz.predkosc.y == 0);
-	bool czyNaDrabinie = gracz.czyNaDrabinie;
+	bool czyGraczSpada = world.gracz.getPredkosc().y > 0 && world.gracz.getCzyNaDrabinie() == false;
+	bool czyGraczLeci = world.gracz.getPredkosc().y < 0 && world.gracz.getCzyNaDrabinie() == false;
+	bool czySiePorusza = (world.gracz.getCzyNaDrabinie() == false) && (world.gracz.getPredkosc().y == 0);
+	bool czyNaDrabinie = world.gracz.getCzyNaDrabinie();
 
 	world.ustalRozmiarGracza(*this);
 
 	if (czySiePorusza) {
-		if (gracz.numerKlatkiPoziom % 4 == 0) {
-			if (gracz.czyRuchWPrawo == true)
+		if (world.gracz.getNumerKlatkiPoziom() % 4 == 0) {
+			if (world.gracz.getCzyRuchWPrawo())
 			{
-				DrawSurface(screen, graczPrawo, gracz.pozycja.x, gracz.pozycja.y);
+				DrawSurface(screen, graczPrawo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 			}
 			else
 			{
-				DrawSurface(screen, graczLewo, gracz.pozycja.x, gracz.pozycja.y);
+				DrawSurface(screen, graczLewo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 			}
 		}
-		else if (gracz.numerKlatkiPoziom % 4 == 1)
+		else if (world.gracz.getNumerKlatkiPoziom() % 4 == 1)
 		{
-			if (gracz.czyRuchWPrawo == true)
+			if (world.gracz.getCzyRuchWPrawo())
 			{
-				DrawSurface(screen, graczRuch1Prawo, gracz.pozycja.x, gracz.pozycja.y);
+				DrawSurface(screen, graczRuch1Prawo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 			}
 			else
 			{
-				DrawSurface(screen, graczRuch1Lewo, gracz.pozycja.x, gracz.pozycja.y);
+				DrawSurface(screen, graczRuch1Lewo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 			}
 		}
-		else if (gracz.numerKlatkiPoziom % 4 == 2)
+		else if (world.gracz.getNumerKlatkiPoziom() % 4 == 2)
 		{
-			if (gracz.czyRuchWPrawo == true)
+			if (world.gracz.getCzyRuchWPrawo())
 			{
-				DrawSurface(screen, graczPrawo, gracz.pozycja.x, gracz.pozycja.y);
+				DrawSurface(screen, graczPrawo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 			}
 			else
 			{
-				DrawSurface(screen, graczLewo, gracz.pozycja.x, gracz.pozycja.y);
+				DrawSurface(screen, graczLewo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 			}
 		}
-		else if (gracz.numerKlatkiPoziom % 4 == 3)
+		else if (world.gracz.getNumerKlatkiPoziom() % 4 == 3)
 		{
-			if (gracz.czyRuchWPrawo == true)
+			if (world.gracz.getCzyRuchWPrawo())
 			{
-				DrawSurface(screen, graczRuch2Prawo, gracz.pozycja.x, gracz.pozycja.y);
+				DrawSurface(screen, graczRuch2Prawo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 			}
 			else
 			{
-				DrawSurface(screen, graczRuch2Lewo, gracz.pozycja.x, gracz.pozycja.y);
+				DrawSurface(screen, graczRuch2Lewo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 			}
 		}
 		return;
 	}
 
 	if (czyNaDrabinie) {
-		DrawSurface(screen, wezSurfaceDrabina(gracz.numerKlatkiPion), gracz.pozycja.x, gracz.pozycja.y);
+		DrawSurface(screen, wezSurfaceDrabina(world.gracz.getNumerKlatkiPion()), world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 		return;
 	}
 
 	if (czyGraczSpada || czyGraczLeci)
 	{
-		if (gracz.czyRuchWPrawo == true)
+		if (world.gracz.getCzyRuchWPrawo())
 		{
-			DrawSurface(screen, graczSkokPrawo, gracz.pozycja.x, gracz.pozycja.y);
+			DrawSurface(screen, graczSkokPrawo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 		}
 		else
 		{
-			DrawSurface(screen, graczSkokLewo, gracz.pozycja.x, gracz.pozycja.y);
+			DrawSurface(screen, graczSkokLewo, world.gracz.getPozycja().x, world.gracz.getPozycja().y);
 		}
 		return;
 	}
-	// else if itp...
 }
 
 
 void Okno::narysujBeczke(Beczka& beczka, double worldTime)
 {
-	/*double x=0;
-	x = worldTime / 0.5;
-	if (x == 0||x==0.1||x==0.2)
-	{
-		DrawSurface(screen, beczka1, beczka.pozycja.x, beczka.pozycja.y);
-	}
-	else
-	{
-		DrawSurface(screen, beczka2, beczka.pozycja.x, beczka.pozycja.y);
-
-	}*/
 	if ((int)worldTime % 2 == 0)
 	{
-		DrawSurface(screen, beczka1, beczka.pozycja.x, beczka.pozycja.y);
+		DrawSurface(screen, beczka1, beczka.getPozycja().x, beczka.getPozycja().y);
 	}
 	else
 	{
-		DrawSurface(screen, beczka2, beczka.pozycja.x, beczka.pozycja.y);
+		DrawSurface(screen, beczka2, beczka.getPozycja().x, beczka.getPozycja().y);
 	}
-
 }
 
 void Okno::narysujPlatforme(Platforma& platforma)
 {
-	if (platforma.dlugosc == najdluzsza)
+	if (platforma.getDlugosc() == najdluzsza)
 	{
-		DrawSurface(screen, platformaNajdluzsza, platforma.pozycja.x, platforma.pozycja.y);
+		DrawSurface(screen, platformaNajdluzsza, platforma.getPozycja().x, platforma.getPozycja().y);
 	}
-	else if (platforma.dlugosc == srednia)
+	else if (platforma.getDlugosc() == srednia)
 	{
-		DrawSurface(screen, platformaSrednia, platforma.pozycja.x, platforma.pozycja.y);
+		DrawSurface(screen, platformaSrednia, platforma.getPozycja().x, platforma.getPozycja().y);
 	}
-	else if (platforma.dlugosc == najkrotsza)
+	else if (platforma.getDlugosc() == najkrotsza)
 	{
-		DrawSurface(screen, platformaNajkrotsza, platforma.pozycja.x, platforma.pozycja.y);
+		DrawSurface(screen, platformaNajkrotsza, platforma.getPozycja().x, platforma.getPozycja().y);
 	}
 
 }
 
 void Okno::narysujDrabine(Drabina& drabina)
 {
-	if (drabina.dlugosc == krotka)
+	if (drabina.getDlugoscDrabiny() == krotka)
 	{
-		DrawSurface(screen, drabinaKrotka, drabina.pozycja.x, drabina.pozycja.y);
+		DrawSurface(screen, drabinaKrotka, drabina.getPozycja().x, drabina.getPozycja().y);
 	}
-	else if (drabina.dlugosc == dluga)
+	else if (drabina.getDlugoscDrabiny() == dluga)
 	{
-		DrawSurface(screen, drabinaDluga, drabina.pozycja.x, drabina.pozycja.y);
+		DrawSurface(screen, drabinaDluga, drabina.getPozycja().x, drabina.getPozycja().y);
 	}
 }
 
 void Okno::narysujBele(Bele& bele)
 {
-	DrawSurface(screen, stosBel, bele.pozycja.x, bele.pozycja.y);
+	DrawSurface(screen, stosBel, bele.getPozycja().x, bele.getPozycja().y);
 }
 
 void Okno::narysujKukurydze(Kukurydza& kukurydza)
 {
-	DrawSurface(screen, kukurydzaSurface, kukurydza.pozycja.x, kukurydza.pozycja.y);
+	DrawSurface(screen, kukurydzaSurface, kukurydza.getPozycja().x, kukurydza.getPozycja().y);
 }
+
+void Okno::narysujPunktyZaSkok(World&world)
+{
+	bool naPlatformie = world.sprawdzCzyGraczStoiNaPlatformie();
+	if (world.gracz.getCzyAnimacjaPunktowZaSkok() && naPlatformie)
+	{
+		if (world.gracz.getCzyAnimacjaPunktowZaZebranieBonusa())
+		{
+			world.gracz.setCzyAnimacjaPunktowZaZebranieBonusa(false);
+			czasRozpoczeciaAnimacjiDodawaniaPunktowBonus = 0.0;
+		}
+
+		if (czasRozpoczeciaAnimacjiDodawaniaPunktowSkok == 0.0)
+		{
+			czasRozpoczeciaAnimacjiDodawaniaPunktowSkok = world.zegar.getWorldTime();
+		}
+
+		if (world.zegar.getWorldTime() - czasRozpoczeciaAnimacjiDodawaniaPunktowSkok >= czasTrwaniaAnimacjiDodawaniaPunktow)
+		{
+			world.gracz.setCzyAnimacjaPunktowZaSkok(false);
+			czasRozpoczeciaAnimacjiDodawaniaPunktowSkok = 0.0;
+		}
+		else
+		{
+			DrawSurface(screen, punktyZaSkok, world.gracz.getPozycja().x, world.gracz.wezY1Zderzen() - 30);//magic number
+		}
+	}
+	
+
+}
+
+void Okno::narysujPunktyZaZebranieBonusa(World&world)
+{
+	if (world.gracz.getCzyAnimacjaPunktowZaZebranieBonusa())
+	{
+		if (world.gracz.getCzyAnimacjaPunktowZaSkok())
+		{
+			world.gracz.setCzyAnimacjaPunktowZaSkok(false);
+			czasRozpoczeciaAnimacjiDodawaniaPunktowSkok = 0.0;
+		}
+
+		if (czasRozpoczeciaAnimacjiDodawaniaPunktowBonus == 0.0)
+		{
+			czasRozpoczeciaAnimacjiDodawaniaPunktowBonus = world.zegar.getWorldTime();
+		}
+
+		if (world.zegar.getWorldTime() - czasRozpoczeciaAnimacjiDodawaniaPunktowBonus >= czasTrwaniaAnimacjiDodawaniaPunktow)
+		{
+			world.gracz.setCzyAnimacjaPunktowZaZebranieBonusa(false);
+			czasRozpoczeciaAnimacjiDodawaniaPunktowBonus = 0.0;
+		}
+		else
+		{
+			DrawSurface(screen, punktyZaZebranieBonusu, world.gracz.getPozycja().x, world.gracz.wezY1Zderzen() - 30);//magic number
+		}
+	}
+	
+}
+
 
 SDL_Surface* Okno::wezSurfaceDrabina(int numerKlatki)
 {
-	if (numerKlatki % 4 == 0)
+	if (numerKlatki % 4 == 0 || numerKlatki % 4 == 2)
 	{
 		return graczDrabina;
 	}
 	else if (numerKlatki % 4 == 1)
 	{
 		return graczDrabina2;
-	}
-	else if (numerKlatki % 4 == 2)
-	{
-		return graczDrabina;
 	}
 	else
 	{

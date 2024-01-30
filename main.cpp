@@ -9,10 +9,6 @@ extern "C" {
 #include"../SDL2-2.0.10/include/SDL_main.h"
 }
 
-#define SCREEN_WIDTH	1400
-#define SCREEN_HEIGHT	800
-
-// main
 #ifdef __cplusplus
 extern "C"
 #endif

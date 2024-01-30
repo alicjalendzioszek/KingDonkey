@@ -12,10 +12,28 @@
 #include "Bele.h"
 #include "BabyKrowa.h"
 #include "Kukurydza.h"
-
+#include "wymiaryOkna.h"
 
 class World
 {
+private:
+
+	Beczka* bele = nullptr;
+	Platforma* platformy = nullptr;
+	Drabina* drabiny = nullptr;
+	Kukurydza* kukurydze = nullptr;
+
+	bool czyKoniecGry = false;
+	bool czyKoniecPoziomu = false;
+
+	int ostatniaAktywacjaBeczki = 0;
+	int czasTworzeniaNowejBeczki = 6; // w sekundach
+	int liczbaBel = 0;
+	int liczbaPlatform = 0;
+	int liczbaDrabin = 0;
+	int liczbaKukurydz = 0;
+	const int liczbaPunktowZaPrzejsciePoziomu = 1000;
+
 public:
 	World();
 
@@ -27,28 +45,25 @@ public:
 	Bele stosBel;
 	BabyKrowa babyKrowa;
 
-	int liczbaBel = 0;
-	Beczka* bele = nullptr;
+	Beczka* getBele();
+	Platforma* getPlatformy();
+	Drabina* getDrabiny();
+	Kukurydza* getKukurydze();
 
-	int liczbaPlatform = 0;
-	Platforma* platformy = nullptr;
+	int getLiczbaBel();
+	int getLiczbaPlatform();
+	int getLiczbaDrabin();
+	int getLiczbaKukurydz();
+	bool getCzyKoniecPoziomu();
+	bool getCzyKoniecGry();
 
-	int liczbaDrabin = 0;
-	Drabina* drabiny = nullptr;
-
-	int liczbaKukurydz = 0;
-	Kukurydza* kukurydze = nullptr;
-
-	bool czyKoniecGry = false;
-	bool czyKoniecPoziomu = false;
-	int lliczbaPunktowZaPrzejsciePoziomu = 1000;
-	//double najWyzszaZNich = 1000;
-	//double najblizszaOdlegloscOdGraczaX = 1000;
-	//int indeksNajblizszejPlatformy = 0;
+	void setLiczbaBel(int liczbaBel);
+	void setLiczbaPlatform(int liczbaPlatform);
+	void setLiczbaDrabin(int liczbaDrabin);
+	void setLiczbaKukurydz(int liczbaKukurydz);
+	void setCzyKoniecPoziomu(bool koniec);
 
 	void utworzSwiat(Okno& okno);
-	//bedziemy do pozycji x gracza dodawac rozmiar(czyli polowe szerokosci) zeby sprawdzic kolizje
-	//void ustalRozmiaryObiektow(Okno &okno);
 
 	void ustalRozmiarGracza(Okno& okno);
 	void ustalRozmiarPrzeciwnika(Okno& okno);
@@ -85,13 +100,15 @@ public:
 	void alokacjaKukurydz();
 	void zwalnianiePamieciKukurydz();
 
-
-
 	bool sprawdzCzyKolizjaZBeczka(Gracz& gracz, Beczka& bela);
+
+	bool sprawdzCzyGraczStoiNaPlatformie();
 
 	bool sprawdzCzyKolizjaZBonusem(Gracz& gracz, Kukurydza& kukurydza);
 
 	void sprawdzCzyGraczSpada();
+
+	void sprawdzCzyGraczPrzeskakujeBeczke();
 
 	void sprawdzCzyKoniecPoziomu();
 
@@ -107,10 +124,7 @@ public:
 	bool czyUaktywnicBeczke(int czas);
 	void czekaj();
 
-private:
-	int ostatniaAktywacjaBeczki = 0;
-	int czasTworzeniaNowejBeczki = 6; // w sekundach
-
+	void setOstatniaAktywacjaBeczki(int czas);
 
 };
 

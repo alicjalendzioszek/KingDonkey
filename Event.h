@@ -10,9 +10,10 @@ class Okno;
 
 class Event
 {
-public:
+private:
 	SDL_Event eventKlikniety;
-
+public:
+	
 	void readEvents(World& world, Okno& okno);
 
 };

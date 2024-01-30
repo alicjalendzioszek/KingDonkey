@@ -10,23 +10,27 @@ void Aplikacja::wystartujGre()
 {
 	while (true) {
 
-		
 		world.zegar.resetZegar();
 
 		while (true) {	
 			okno.narysujSwiat(world);
 			world.wykonajTure(okno);
 
-			if (world.czyKoniecPoziomu == true) {
-				world.czyKoniecPoziomu = false;
+			if (world.getCzyKoniecPoziomu()) {
+				world.setCzyKoniecPoziomu(false);
+				okno.setCzasRozpoczeciaAnimacjiDodawaniaPunktowBonus(0.0);
+				okno.setCzasRozpoczeciaAnimacjiDodawaniaPunktowSkok(0.0);
+				world.gracz.setCzyAnimacjaPunktowZaSkok(false);
+				world.gracz.setCzyAnimacjaPunktowZaZebranieBonusa(false);
+				world.setOstatniaAktywacjaBeczki(0);
 				break;
 			}
 
-			if (okno.czyKoniec == true||world.czyKoniecGry==true) {
+			if (okno.getCzyKoniec()||world.getCzyKoniecGry()) {
 				return;
 			}
 
-			world.czekaj();
+			//world.czekaj();
 
 		}
 		world.zwalnianiePamieciDrabin();
@@ -34,8 +38,5 @@ void Aplikacja::wystartujGre()
 		world.zwalnianiePamieciBel();
 		world.zwalnianiePamieciKukurydz();
 		world.utworzSwiat(okno);
-		// przejdz do nowego etapu tj. stworz poziom na nowo kolejny poziom
-		// a jak ktos wyjdzie
-
 	}
 }
